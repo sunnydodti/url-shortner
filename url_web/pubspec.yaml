@@ -1,7 +1,7 @@
 name: url_web
 description: "A simple url shortner"
 
-publish_to: 'none' 
+publish_to: 'none'
 
 version: 1.0.0+1
 
@@ -11,12 +11,11 @@ environment:
 
 dependencies:
   collection: ^1.19.0
+  cupertino_icons: ^1.0.8
   flutter:
     sdk: flutter
   flutter_web_plugins:
     sdk: flutter
-
-  cupertino_icons: ^1.0.8
   hive_ce: ^2.10.1
   hive_ce_flutter: ^2.2.0
   intl: ^0.20.2
@@ -24,12 +23,13 @@ dependencies:
   provider: ^6.1.2
   pwa_install: ^0.0.6
   share_plus: ^10.1.4
+  validators: ^3.0.0
 
 dev_dependencies:
-  flutter_test:
-    sdk: flutter
 
   flutter_lints: ^5.0.0
+  flutter_test:
+    sdk: flutter
 
 flutter:
   uses-material-design: true

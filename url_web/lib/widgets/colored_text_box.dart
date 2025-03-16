@@ -21,29 +21,44 @@ class ColoredTextBox extends StatelessWidget {
   });
 
   // Helper constructors for different colors
-  factory ColoredTextBox.green(String text) => ColoredTextBox(
+  factory ColoredTextBox.green(String text, {double fontSize = 13, upperCase = true}) =>
+      ColoredTextBox(
         text: text,
         color: Colors.green,
+        fontSize: fontSize,
+        upperCase: upperCase,
       );
 
-  factory ColoredTextBox.red(String text) => ColoredTextBox(
+  factory ColoredTextBox.red(String text, {double fontSize = 13, upperCase = true}) =>
+      ColoredTextBox(
         text: text,
         color: Colors.red,
+        fontSize: fontSize,
+        upperCase: upperCase,
       );
 
-  factory ColoredTextBox.orange(String text) => ColoredTextBox(
+  factory ColoredTextBox.orange(String text, {double fontSize = 13, upperCase = true}) =>
+      ColoredTextBox(
         text: text,
         color: Colors.orange,
+        fontSize: fontSize,
+        upperCase: upperCase,
       );
 
-  factory ColoredTextBox.grey(String text) => ColoredTextBox(
+  factory ColoredTextBox.grey(String text, {double fontSize = 13, upperCase = true}) =>
+      ColoredTextBox(
         text: text,
         color: Colors.grey,
+        fontSize: fontSize,
+        upperCase: upperCase,
       );
 
-  factory ColoredTextBox.blue(String text) => ColoredTextBox(
+  factory ColoredTextBox.blue(String text, {double fontSize = 13, upperCase = true}) =>
+      ColoredTextBox(
         text: text,
         color: Colors.blue,
+        fontSize: fontSize,
+        upperCase: upperCase,
       );
 
   @override
