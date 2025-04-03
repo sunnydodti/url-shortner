@@ -16,13 +16,21 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  TextEditingController urlController = TextEditingController();
-  TextEditingController shortUrlController = TextEditingController();
+  late TextEditingController urlController;
+  late TextEditingController shortUrlController;
   UrlStatus urlStatus = UrlStatus.none;
   ShortUrlStatus shortUrlStatus = ShortUrlStatus.none;
   Timer? urlTimer;
   Timer? shortUrlTimer;
   final double helperFontSize = 9;
+
+  @override
+  void initState() {
+    urlController = TextEditingController();
+    shortUrlController = TextEditingController();
+    shortUrlController.text = '';
+    super.initState();
+  }
 
   @override
   void dispose() {
@@ -88,7 +96,7 @@ class _HomePageState extends State<HomePage> {
       controller: shortUrlController,
       onChanged: onShortUrlChanged,
       maxLength: 50,
-      maxLines: 2,
+      maxLines: 3,
       minLines: 1,
       decoration: InputDecoration(
           border: const OutlineInputBorder(),
@@ -168,107 +176,101 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _buildSubmitButton() {
-  if (urlStatus != UrlStatus.valid) return SizedBox.shrink();
-  
-  // Determine if the button should be enabled
-  bool isShortUrlValid = shortUrlStatus == ShortUrlStatus.valid || 
-                         shortUrlStatus == ShortUrlStatus.available ||
-                         shortUrlStatus == ShortUrlStatus.none;
-  
-  return Padding(
-    padding: const EdgeInsets.only(top: 16.0),
-    child: ElevatedButton(
-      onPressed: !isShortUrlValid ? null : () async {
-        // Unfocus any text fields to prevent the pointer binding issue
-        FocusScope.of(context).unfocus();
-        
-        // Show loading state if needed
-        setState(() {
-          // Optional loading state
-        });
-        
-        try {
-          final String url = urlController.text;
-          final String? shortUrl = shortUrlController.text.isEmpty ? null : shortUrlController.text;
-          
-          final result = await UrlService.isAvailable(shortUrl ?? "");
-          
-          if (result || shortUrl == null) {
-            final shortenedUrl = await UrlService.shortenUrl(url,);
-            // final shortenedUrl = await UrlService.shortenUrl(
-            //   originalUrl: url,
-            //   customShortUrl: shortUrl,
-            // );
-            
-            if (shortenedUrl != null) {
-              // Show success dialog
-              if (mounted) {
-                showDialog(
-                  context: context,
-                  barrierDismissible: false,
-                  builder: (context) => AlertDialog(
-                    title: Text('URL Shortened Successfully'),
-                    content: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('Your shortened URL:'),
-                        SizedBox(height: 8),
-                        SelectableText('url.persist.site/$shortenedUrl'),
-                        SizedBox(height: 16),
-                        Text('Original URL:'),
-                        SizedBox(height: 8),
-                        Text(
-                          url,
-                          maxLines: 3,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ],
-                    ),
-                    actions: [
-                      TextButton(
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
-                        child: Text('Close'),
-                      ),
-                    ],
-                  ),
-                );
-              }
-              
-              // Reset form
-              urlController.clear();
-              shortUrlController.clear();
-              setState(() {
-                urlStatus = UrlStatus.none;
-                shortUrlStatus = ShortUrlStatus.none;
-              });
-            } else {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('Failed to create short URL')),
-              );
-            }
-          } else {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('The custom short URL is not available')),
-            );
-          }
-        } catch (e) {
-          if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('Error: ${e.toString()}')),
-            );
+    // if (urlStatus != UrlStatus.valid) return SizedBox.shrink();
+
+    bool isShortUrlValid = shortUrlStatus == ShortUrlStatus.available ||
+        shortUrlStatus == ShortUrlStatus.none;
+    bool isUrlValid = urlStatus == UrlStatus.valid;
+
+    return Padding(
+      padding: const EdgeInsets.only(top: 16.0),
+      child: ElevatedButton(
+        onPressed: !isShortUrlValid || !isUrlValid ? null : submitUrl,
+        style: ElevatedButton.styleFrom(
+          padding: EdgeInsets.symmetric(vertical: 12, horizontal: 24),
+        ),
+        child: Text('Shorten'),
+      ),
+    );
+  }
+
+  Future<void> submitUrl() async {
+    {
+      FocusScope.of(context).unfocus();
+
+      // Show loading state if needed
+      setState(() {});
+
+      final String shortUrl = shortUrlController.text;
+      try {
+        if (shortUrlController.text.isNotEmpty) {
+          final result = await UrlService.isAvailable(shortUrl);
+          if (!result) {
+            setState(() => shortUrlStatus = ShortUrlStatus.unavailable);
+            return;
           }
         }
-      },
-      style: ElevatedButton.styleFrom(
-        padding: EdgeInsets.symmetric(vertical: 12, horizontal: 24),
-      ),
-      child: Text('Submit'),
-    ),
-  );
-}
+        final String url = urlController.text;
+
+        final shortenedUrl = await UrlService.shortenUrl(
+          url,
+          customShortUrl: shortUrl,
+        );
+
+        if (shortenedUrl.isEmpty) return;
+
+        // Show success dialog
+        if (mounted) {
+          showDialog(
+            context: context,
+            barrierDismissible: false,
+            builder: (context) => AlertDialog(
+              title: Text('URL Shortened Successfully'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Your shortened URL:'),
+                  SizedBox(height: 8),
+                  SelectableText('url.persist.site/$shortenedUrl'),
+                  SizedBox(height: 16),
+                  Text('Original URL:'),
+                  SizedBox(height: 8),
+                  Text(
+                    url,
+                    maxLines: 3,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: Text('Close'),
+                ),
+              ],
+            ),
+          );
+
+          // Reset form
+          urlController.clear();
+          shortUrlController.clear();
+          setState(() {
+            urlStatus = UrlStatus.none;
+            shortUrlStatus = ShortUrlStatus.none;
+          });
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Error: ${e.toString()}')),
+          );
+        }
+      }
+    }
+  }
 
   SizedBox buildInvalidShortUrlHelper() {
     return SizedBox(
@@ -304,7 +306,7 @@ class _HomePageState extends State<HomePage> {
     }
 
     setState(() => urlStatus = UrlStatus.checking);
-    urlTimer = Timer(const Duration(milliseconds: 500), () {
+    urlTimer = Timer(const Duration(milliseconds: 400), () {
       evaluateUrl(value);
     });
   }
@@ -342,6 +344,7 @@ class _HomePageState extends State<HomePage> {
       return;
     }
     setState(() => shortUrlStatus = ShortUrlStatus.valid);
+    await Future.delayed(const Duration(milliseconds: 300));
     setState(() => shortUrlStatus = ShortUrlStatus.checkingAvalability);
 
     bool isAvailaable = await UrlService.isAvailable(shortUrlController.text);

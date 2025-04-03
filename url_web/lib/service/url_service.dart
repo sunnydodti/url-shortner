@@ -2,13 +2,45 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class UrlService {
-  static const String _baseUrl = 'http://localhost:64638';
+  static const String _baseUrl = 'http://localhost:55494';
 
-  static Future<String> shortenUrl(String longUrl) async {
-    // Simulate shortening the URL
-    await Future.delayed(const Duration(seconds: 1));
-    return '123456';
+  static Future<String> shortenUrl(String longUrl, {String? customShortUrl = ''}) async {
+  try {
+    final response = await http.post(
+      Uri.parse('$_baseUrl/shorten'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        'url': longUrl,
+        'shortCode': customShortUrl,
+      }),
+    );
+    
+    if (response.statusCode == 201) {
+      final data = jsonDecode(response.body);
+      return data['shortCode'];
+    } else {
+      // Parse error message from the response if available
+      var errorMessage = 'Failed to shorten URL';
+      try {
+        final errorData = jsonDecode(response.body);
+        if (errorData['error'] != null) {
+          errorMessage = errorData['error'];
+        }
+      } catch (_) {
+        // If we can't parse the error, use the status code
+        errorMessage = 'Server returned status code ${response.statusCode}';
+      }
+      
+      throw Exception(errorMessage);
+    }
+  } catch (e) {
+    print('Error shortening URL: $e');
+    if (e is Exception) {
+      rethrow;
+    }
+    throw Exception('Failed to shorten URL: $e');
   }
+}
 
   static Future<bool> isAvailable(String shortUrl) async {
     try {
