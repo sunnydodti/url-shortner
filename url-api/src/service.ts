@@ -105,7 +105,7 @@ export async function zara(c: Context) {
     }
 }
 
-export async function isUrlTaken(c: Context) {
+export async function isUrlAvailable(c: Context) {
     var isTaken: boolean = false;
     try {
         const url = c.req.param("url");
@@ -119,11 +119,10 @@ export async function isUrlTaken(c: Context) {
         console.log("in try b4", isTaken);
         isTaken = await isShortCodeTaken(c, url);
         console.log("in try aftr", isTaken);
-        return c.json({ isTaken });
     } catch (error) {
         console.log("out try", error);
-        return c.json({ isTaken });
     }
+    return c.json({ isAvailable: !isTaken });
 }
 
 function generateShortUrl(): string {
