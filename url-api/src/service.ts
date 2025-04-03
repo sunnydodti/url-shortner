@@ -1,4 +1,7 @@
 import { Context } from "hono";
+
+import isUrlHttp from 'is-url-http';
+
 import { getDbClient } from "./db";
 import { TABLE_USER, TABLE_URL, TABLE_USER_URL } from "./db";
 
@@ -37,22 +40,24 @@ export async function getAllUserUrls(c: Context) {
 
 export async function shortenUrl(c: Context) {
     try {
-        const { url, shortCode } = await c.req.json();
-        const original_url = url;
-        let code = shortCode;
-        const client = getDbClient(c);
+        var { url, shortCode } = await c.req.json();
+        console.log("shortCode-r", shortCode);
+        console.log("url-r", url);
 
+        if (!url) return c.json({ "error": "invalid request" }, 400);
+
+        if (!url.startsWith("http")) url = "https://" + url;
+        if (!isUrlHttp(url)) return c.json({ "error": "invalid url" }, 400);
+        
         if (shortCode) {
-            if (await isShortCodeTaken(c, shortCode)) {
-                return c.text("url is already taken", 400);
-            }
+            console.log("shortCode:", shortCode);
+            if (shortCode.length < 3 || shortCode.length > 50) return c.json({ "error": "short code length must be between 3 and 50 characters" }, 400);
+            if (await isShortCodeTaken(c, shortCode)) return c.json({ "error": "url is already taken" }, 400);
         }
-
-        if (!shortCode) code = await getUniqueShortUrl(c);
-
-        const result = await saveUrlToDbshortCode(c, original_url, code, "1");
-        console.log(result);
-        return c.json({ short_code: shortCode, original_url: original_url }, 201);
+        if (!shortCode || shortCode.length < 1) shortCode = await getUniqueShortUrl(c);
+        
+        const result = await saveUrlToDbshortCode(c, url, shortCode);
+        return c.json({ shortCode, url }, 201);
     } catch (error) {
         console.error("Error shortening URL:", error);
         return c.text("Error shortening URL", 500);
@@ -135,7 +140,7 @@ function generateShortUrl(): string {
     return shortCode;
 }
 
-async function saveUrlToDbshortCode(c: Context, url: string, shortCode: string, userId: string) {
+async function saveUrlToDbshortCode(c: Context, url: string, shortCode: string, userId: string = "") {
     const client = getDbClient(c);
     var result;
     if (!userId) {
@@ -162,8 +167,6 @@ async function isShortCodeTaken(c: Context, shortCode: string) {
         `SELECT * FROM ${TABLE_URL} WHERE short_code = $1`,
         [shortCode],
     );
-    console.log(shortCode);
-
     return isTaken.rows.length > 0;
 }
 
