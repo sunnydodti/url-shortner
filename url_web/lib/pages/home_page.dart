@@ -49,6 +49,8 @@ class _HomePageState extends State<HomePage> {
             _buildUrlField(),
             SizedBox(height: 16),
             _buildShortUrlField(),
+            SizedBox(height: 16),
+            _buildSubmitButton(),
           ],
         ),
       ),
@@ -165,39 +167,135 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+  Widget _buildSubmitButton() {
+  if (urlStatus != UrlStatus.valid) return SizedBox.shrink();
+  
+  // Determine if the button should be enabled
+  bool isShortUrlValid = shortUrlStatus == ShortUrlStatus.valid || 
+                         shortUrlStatus == ShortUrlStatus.available ||
+                         shortUrlStatus == ShortUrlStatus.none;
+  
+  return Padding(
+    padding: const EdgeInsets.only(top: 16.0),
+    child: ElevatedButton(
+      onPressed: !isShortUrlValid ? null : () async {
+        // Unfocus any text fields to prevent the pointer binding issue
+        FocusScope.of(context).unfocus();
+        
+        // Show loading state if needed
+        setState(() {
+          // Optional loading state
+        });
+        
+        try {
+          final String url = urlController.text;
+          final String? shortUrl = shortUrlController.text.isEmpty ? null : shortUrlController.text;
+          
+          final result = await UrlService.isAvailable(shortUrl ?? "");
+          
+          if (result || shortUrl == null) {
+            final shortenedUrl = await UrlService.shortenUrl(url,);
+            // final shortenedUrl = await UrlService.shortenUrl(
+            //   originalUrl: url,
+            //   customShortUrl: shortUrl,
+            // );
+            
+            if (shortenedUrl != null) {
+              // Show success dialog
+              if (mounted) {
+                showDialog(
+                  context: context,
+                  barrierDismissible: false,
+                  builder: (context) => AlertDialog(
+                    title: Text('URL Shortened Successfully'),
+                    content: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('Your shortened URL:'),
+                        SizedBox(height: 8),
+                        SelectableText('url.persist.site/$shortenedUrl'),
+                        SizedBox(height: 16),
+                        Text('Original URL:'),
+                        SizedBox(height: 8),
+                        Text(
+                          url,
+                          maxLines: 3,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        child: Text('Close'),
+                      ),
+                    ],
+                  ),
+                );
+              }
+              
+              // Reset form
+              urlController.clear();
+              shortUrlController.clear();
+              setState(() {
+                urlStatus = UrlStatus.none;
+                shortUrlStatus = ShortUrlStatus.none;
+              });
+            } else {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('Failed to create short URL')),
+              );
+            }
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('The custom short URL is not available')),
+            );
+          }
+        } catch (e) {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Error: ${e.toString()}')),
+            );
+          }
+        }
+      },
+      style: ElevatedButton.styleFrom(
+        padding: EdgeInsets.symmetric(vertical: 12, horizontal: 24),
+      ),
+      child: Text('Submit'),
+    ),
+  );
+}
+
   SizedBox buildInvalidShortUrlHelper() {
     return SizedBox(
-        height: 22,
-        child: Center(
-          child: Scrollbar(
-            scrollbarOrientation: ScrollbarOrientation.right,
-            interactive: true,
-            trackVisibility: true,
-            thickness: 10,
-            thumbVisibility: true,
-            radius: const Radius.circular(10),
-            child: ListView(
-              scrollDirection: Axis.horizontal,
-              
-              children: [
-                ColoredTextBox.red(
-                  'invalid',
-                  fontSize: helperFontSize,
-                ),
-                ColoredTextBox.grey(
-                  'SUPPORTED: a-z  |  A-Z  |  0-9  |  -  |  _  |  .',
-                  fontSize: helperFontSize,
-                  upperCase: false,
-                ),
-                ColoredTextBox.grey(
-                  'length: 3-50',
-                  fontSize: helperFontSize,
-                ),
-              ],
+      height: 22,
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          children: [
+            ColoredTextBox.red(
+              'invalid',
+              fontSize: helperFontSize,
             ),
-          ),
+            SizedBox(width: 4),
+            ColoredTextBox.grey(
+              'SUPPORTED: a-z | A-Z | 0-9 | - | _ | .',
+              fontSize: helperFontSize,
+              upperCase: false,
+            ),
+            SizedBox(width: 4),
+            ColoredTextBox.grey(
+              'length: 3-50',
+              fontSize: helperFontSize,
+            ),
+          ],
         ),
-      );
+      ),
+    );
   }
 
   void onUrlChanged(String? value) {
