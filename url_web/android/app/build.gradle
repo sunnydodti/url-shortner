@@ -47,7 +47,8 @@ android {
             dimension "flavor-type"
             resValue "string", "app_name", "Kiwi Clock"
         }
-
+    }
+    
     buildTypes {
         release {
             // TODO: Add your own signing config for the release build.
