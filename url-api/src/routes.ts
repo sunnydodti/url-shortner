@@ -1,5 +1,5 @@
 import { Hono } from "hono";
-import { getAllUsers, getAllUrls, getAllUserUrls, shortenUrl, redirectUrl, isUrlAvailable } from "./service";
+import { getAllUsers, getAllUrls, getAllUserUrls, shortenUrl, redirectUrl, isUrlAvailable, checkViews } from "./service";
 
 const routes = new Hono();
 
@@ -9,5 +9,6 @@ const routes = new Hono();
 routes.post("/shorten", shortenUrl);
 routes.get("/:shortCode", redirectUrl);
 routes.get("/is-available/:url", isUrlAvailable);
+routes.get("/views/:url", checkViews);
 
 export { routes };

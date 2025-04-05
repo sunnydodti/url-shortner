@@ -133,6 +133,18 @@ export async function isUrlAvailable(c: Context) {
     return c.json({ isAvailable: !isTaken });
 }
 
+export async function checkViews(c: Context) {
+    try {
+        const url = c.req.param("url");
+        if (url.length < 3) return c.json({ error: "invalid request" }, 400);
+        const views = await getByShortcode(c, url);
+        if (views.rows.length === 0) return c.json({ error: "not found" }, 404);
+        return c.json({ views: views.rows[0].clicks }, 200);
+    } catch (error) {
+        return c.json({ "error": "invalid request" }, 500);
+    }
+}
+
 function generateShortUrl(): string {
     // Basic short code generator (you should use a more robust method in production)
     const characters = "ABCDEFGHJKMNOPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz0123456789"; //  L, l & I removed
@@ -173,6 +185,15 @@ async function isShortCodeTaken(c: Context, shortCode: string) {
     return isTaken.rows.length > 0;
 }
 
+async function getByShortcode(c: Context, shortCode: string) {
+    const client = getDbClient(c);
+    let views = await client.query(
+        `SELECT clicks FROM ${TABLE_URL} WHERE short_code = $1`,
+        [shortCode],
+    );
+    return views;
+}
+
 async function getUniqueShortUrl(c: Context) {
     let shortCode = generateShortUrl();
     while (await isShortCodeTaken(c, shortCode)) {
@@ -180,6 +201,7 @@ async function getUniqueShortUrl(c: Context) {
     }
     return shortCode;
 }
+
 function isNotSupported(url: string): boolean {
     return UNSUPPORTED_URLS.some(unsupported => url.includes(unsupported));
 }

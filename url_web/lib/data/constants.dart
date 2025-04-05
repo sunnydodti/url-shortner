@@ -16,14 +16,14 @@ class Constants {
   static String url = 'urls.persist.site';
   static String baseUrl = 'https://$url';
 
-  static final String _apiBase = 'https://url.dodtisunny.workers.dev';
+  static final String _apiBase = 'url.persist.site';
 
   static String get apiBase {
     if (kDebugMode) {
-      return 'https://url.dodtisunny.workers.dev';
-      // return 'http://localhost:55494';
+      // return 'https://url.persist.site';
+      return 'http://127.0.0.1:61131';
     }
-    return _apiBase;
+    return 'https://$_apiBase';
   }
 
   static List<String> unSupportedUrls = [

@@ -8,8 +8,10 @@ import '../data/constants.dart';
 import '../enums/url_status.dart';
 import '../service/url_service.dart';
 import '../widgets/colored_text_box.dart';
+import '../widgets/mobile_wrapper.dart';
 import '../widgets/my_appbar.dart';
 import '../widgets/shortened_url_dialog.dart';
+import 'views_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -46,20 +48,35 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: MyAppbar.build(context),
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: ListView(
-          scrollDirection: Axis.vertical,
-          children: [
-            _buildUrlField(),
-            SizedBox(height: 16),
-            _buildShortUrlField(),
-            SizedBox(height: 16),
-            _buildSubmitButton(),
-          ],
+    return MobileWrapper(
+      child: Scaffold(
+        appBar: MyAppbar.build(context),
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        body: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            children: [
+              Expanded(
+                child: ListView(
+                  scrollDirection: Axis.vertical,
+                  children: [
+                    _buildUrlField(),
+                    SizedBox(height: 16),
+                    _buildShortUrlField(),
+                    SizedBox(height: 16),
+                    _buildSubmitButton(),
+                  ],
+                ),
+              ),
+              ElevatedButton(
+                  onPressed: () {
+                    // got to views page material page
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) => ViewsPage()));
+                  },
+                  child: Text('Check Views'))
+            ],
+          ),
         ),
       ),
     );
@@ -230,7 +247,8 @@ class _HomePageState extends State<HomePage> {
           showDialog(
             context: context,
             barrierDismissible: false,
-            builder: (context) => ShortenedUrlDialog(shortenedUrl: shortenedUrl, url: url),
+            builder: (context) =>
+                ShortenedUrlDialog(shortenedUrl: shortenedUrl, url: url),
           );
 
           // Reset form
