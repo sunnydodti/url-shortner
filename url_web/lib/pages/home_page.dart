@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:validators/validators.dart';
 
+import '../data/constants.dart';
 import '../enums/url_status.dart';
 import '../service/url_service.dart';
 import '../widgets/colored_text_box.dart';
@@ -136,6 +137,11 @@ class _HomePageState extends State<HomePage> {
         );
       case UrlStatus.invalid:
         return buildInvalidUrlHelper();
+      case UrlStatus.unsupported:
+        return ColoredTextBox.red(
+          'unsupported url',
+          fontSize: helperFontSize,
+        );
     }
   }
 
@@ -392,6 +398,10 @@ class _HomePageState extends State<HomePage> {
       setState(() => urlStatus = UrlStatus.invalid);
       return;
     }
+    if (!isSupportedUrl(url)) {
+      setState(() => urlStatus = UrlStatus.unsupported);
+      return;
+    }
     setState(() => urlStatus = UrlStatus.valid);
   }
 
@@ -423,6 +433,21 @@ class _HomePageState extends State<HomePage> {
     } catch (e) {
       return false;
     }
+  }
+
+  bool isSupportedUrl(String url) {
+    bool isSupported = true;
+    try {
+      for (String unsupportedUrl in Constants.unSupportedUrls) {
+        if (url.contains(unsupportedUrl)) {
+          isSupported = false;
+          break;
+        }
+      }
+    } catch (e) {
+      isSupported = false;
+    }
+    return isSupported;
   }
 
   bool isValidShortUrl(String url) {

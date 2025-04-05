@@ -2,6 +2,7 @@ enum UrlStatus {
   none,
   valid,
   invalid,
+  unsupported,
   checking,
 }
 

@@ -4,6 +4,7 @@ import isUrlHttp from 'is-url-http';
 
 import { getDbClient } from "./db";
 import { TABLE_USER, TABLE_URL, TABLE_USER_URL } from "./db";
+import { UNSUPPORTED_URLS } from "./constants";
 
 export async function getAllUsers(c: Context) {
     try {
@@ -48,6 +49,8 @@ export async function shortenUrl(c: Context) {
 
         if (!url.startsWith("http")) url = "https://" + url;
         if (!isUrlHttp(url)) return c.json({ "error": "invalid url" }, 400);
+
+        if (!isNotSupported(url)) return c.json({ "error": "url is not supported" }, 400);
         
         if (shortCode) {
             console.log("shortCode:", shortCode);
@@ -177,3 +180,7 @@ async function getUniqueShortUrl(c: Context) {
     }
     return shortCode;
 }
+function isNotSupported(url: string): boolean {
+    return UNSUPPORTED_URLS.some(unsupported => url.includes(unsupported));
+}
+

@@ -20,9 +20,16 @@ class Constants {
 
   static String get apiBase {
     if (kDebugMode) {
-      return "https://url.dodtisunny.workers.dev";
+      return 'https://url.dodtisunny.workers.dev';
       // return 'http://localhost:55494';
     }
     return _apiBase;
   }
+
+  static List<String> unSupportedUrls = [
+    'url.persist.site',
+    'urls.persist.site',
+    'localhost:',
+    '127.0.0.1',
+  ];
 }
