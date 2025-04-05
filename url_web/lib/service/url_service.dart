@@ -1,9 +1,10 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
-class UrlService {
-  static const String _baseUrl = 'http://localhost:55494';
+import '../data/constants.dart';
 
+class UrlService {
+  static final String _baseUrl = Constants.apiBase;
   static Future<String> shortenUrl(String longUrl, {String? customShortUrl = ''}) async {
   try {
     final response = await http.post(

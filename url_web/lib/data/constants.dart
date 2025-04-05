@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 
 class Constants {
   static String appDisplayName = 'Url Shortner';
@@ -15,4 +16,10 @@ class Constants {
   static String url = 'urls.persist.site';
   static String baseUrl = 'https://$url';
 
+  static final String _apiBase = 'https://url.dodtisunny.workers.dev/';
+
+  static String get apiBase {
+    if (kDebugMode) return 'http://localhost:55494';
+    return _apiBase;
+  }
 }
