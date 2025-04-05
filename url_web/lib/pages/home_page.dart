@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:validators/validators.dart';
 
 import '../enums/url_status.dart';
@@ -122,7 +123,7 @@ class _HomePageState extends State<HomePage> {
   Widget? _getUrlHelperText() {
     switch (urlStatus) {
       case UrlStatus.none:
-        return null;
+        return buildPasteHelper();
       case UrlStatus.checking:
         return ColoredTextBox.grey(
           'checking...',
@@ -326,8 +327,35 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  GestureDetector buildPasteHelper() {
+    return GestureDetector(
+      onTap: () async {
+        urlController.text = await clipboardText;
+        onUrlChanged(urlController.text);
+      },
+      child: ColoredTextBox.blue('paste', fontSize: helperFontSize),
+    );
+  }
+
+  Future<String> get clipboardText async {
+    String? clipboardText;
+    try {
+      final clipboardData = await Clipboard.getData(Clipboard.kTextPlain);
+      clipboardText = clipboardData?.text;
+    } on Exception catch (_) {
+      showSnackbar('Please Allow Clipboard Permission');
+    }
+    return clipboardText ?? '';
+  }
+
+  void showSnackbar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message), duration: const Duration(seconds: 2)),
+    );
+  }
+
   bool get suggestCompletion {
-    bool isValidLength = urlController.text.length > 3;
+    bool isValidLength = urlController.text.isNotEmpty;
     bool isValidUrlChars = isValidUrl('${urlController.text}.com');
 
     return isValidLength && isValidUrlChars;
