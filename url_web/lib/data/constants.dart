@@ -16,7 +16,7 @@ class Constants {
   static String url = 'urls.persist.site';
   static String baseUrl = 'https://$url';
 
-  static final String _apiBase = 'https://url.dodtisunny.workers.dev/';
+  static final String _apiBase = 'https://url.dodtisunny.workers.dev';
 
   static String get apiBase {
     if (kDebugMode) return 'http://localhost:55494';
