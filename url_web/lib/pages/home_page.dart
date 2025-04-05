@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:pwa_install/pwa_install.dart';
 import 'package:validators/validators.dart';
 
 import '../data/constants.dart';
@@ -68,16 +69,39 @@ class _HomePageState extends State<HomePage> {
                   ],
                 ),
               ),
-              ElevatedButton(
-                  onPressed: () {
-                    // got to views page material page
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (context) => ViewsPage()));
-                  },
-                  child: Text('Check Views'))
+              _buildViewsButton(context),
+              if (PWAInstall().installPromptEnabled) SizedBox(height: 16),
+              if (PWAInstall().installPromptEnabled) _buildPwaInstallButton(),
+              if (PWAInstall().installPromptEnabled) SizedBox(height: 16),
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  SizedBox _buildViewsButton(BuildContext context) {
+    return SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () {
+                  // got to views page material page
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => ViewsPage()));
+                },
+                child: Text('Check Views'),
+              ),
+            );
+  }
+
+  SizedBox _buildPwaInstallButton() {
+    return SizedBox(
+      width: double.infinity,
+      child: ElevatedButton(
+        onPressed: () {
+          PWAInstall().promptInstall_();
+        },
+        child: const Text('Install PWA'),
       ),
     );
   }
