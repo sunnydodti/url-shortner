@@ -134,10 +134,7 @@ class _HomePageState extends State<HomePage> {
           fontSize: helperFontSize,
         );
       case UrlStatus.invalid:
-        return ColoredTextBox.red(
-          'invalid url',
-          fontSize: helperFontSize,
-        );
+        return buildInvalidUrlHelper();
     }
   }
 
@@ -298,6 +295,42 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
     );
+  }
+
+  SizedBox buildInvalidUrlHelper() {
+    return SizedBox(
+      height: 22,
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          children: [
+            ColoredTextBox.red(
+              'invalid url',
+              fontSize: helperFontSize,
+            ),
+            SizedBox(width: 4),
+            if (suggestCompletion)
+              GestureDetector(
+                onTap: () {
+                  urlController.text += '.com';
+                  onUrlChanged(urlController.text);
+                },
+                child: ColoredTextBox.blue(
+                  '.com',
+                  fontSize: helperFontSize,
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  bool get suggestCompletion {
+    bool isValidLength = urlController.text.length > 3;
+    bool isValidUrlChars = isValidUrl('${urlController.text}.com');
+
+    return isValidLength && isValidUrlChars;
   }
 
   void onUrlChanged(String? value) {
