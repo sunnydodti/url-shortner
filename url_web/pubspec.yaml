@@ -24,13 +24,14 @@ dependencies:
   provider: ^6.1.2
   pwa_install: ^0.0.6
   share_plus: ^10.1.4
+  url_launcher: ^6.3.1
   validators: ^3.0.0
 
 dev_dependencies:
+  flutter_launcher_icons: ^0.14.3
   flutter_lints: ^5.0.0
   flutter_test:
     sdk: flutter
-  flutter_launcher_icons: ^0.14.3
 
 flutter:
   uses-material-design: true

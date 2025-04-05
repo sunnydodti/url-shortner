@@ -9,6 +9,7 @@ import '../enums/url_status.dart';
 import '../service/url_service.dart';
 import '../widgets/colored_text_box.dart';
 import '../widgets/my_appbar.dart';
+import '../widgets/shortened_url_dialog.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -45,9 +46,6 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    // double width = MediaQuery.of(context).size.width;
-    // double height = MediaQuery.of(context).size.height;
-
     return Scaffold(
       appBar: MyAppbar.build(context),
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
@@ -207,7 +205,11 @@ class _HomePageState extends State<HomePage> {
 
       final String shortUrl = shortUrlController.text;
       try {
-        if (shortUrlController.text.isNotEmpty) {
+        if (shortUrl.isNotEmpty) {
+          if (shortUrl.length < 3) {
+            showSnackbar('Short URL length must be atleast 3');
+            return;
+          }
           final result = await UrlService.isAvailable(shortUrl);
           if (!result) {
             setState(() => shortUrlStatus = ShortUrlStatus.unavailable);
@@ -228,34 +230,7 @@ class _HomePageState extends State<HomePage> {
           showDialog(
             context: context,
             barrierDismissible: false,
-            builder: (context) => AlertDialog(
-              title: Text('URL Shortened Successfully'),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('Your shortened URL:'),
-                  SizedBox(height: 8),
-                  SelectableText('url.persist.site/$shortenedUrl'),
-                  SizedBox(height: 16),
-                  Text('Original URL:'),
-                  SizedBox(height: 8),
-                  Text(
-                    url,
-                    maxLines: 3,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  child: Text('Close'),
-                ),
-              ],
-            ),
+            builder: (context) => ShortenedUrlDialog(shortenedUrl: shortenedUrl, url: url),
           );
 
           // Reset form
@@ -267,11 +242,7 @@ class _HomePageState extends State<HomePage> {
           });
         }
       } catch (e) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Error: ${e.toString()}')),
-          );
-        }
+        showSnackbar('Error: ${e.toString()}');
       }
     }
   }
