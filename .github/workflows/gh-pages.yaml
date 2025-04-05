@@ -13,7 +13,7 @@ jobs:
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     env:
-      FLUTTER_BASE: "."
+      FLUTTER_BASE: "url_web"
       MAIN_FILE: main.dart
       FLAVOUR: alpha
 
