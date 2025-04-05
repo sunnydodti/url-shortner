@@ -19,7 +19,10 @@ class Constants {
   static final String _apiBase = 'https://url.dodtisunny.workers.dev';
 
   static String get apiBase {
-    if (kDebugMode) return 'http://localhost:55494';
+    if (kDebugMode) {
+      return "https://url.dodtisunny.workers.dev";
+      // return 'http://localhost:55494';
+    }
     return _apiBase;
   }
 }
