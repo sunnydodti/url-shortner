@@ -3,7 +3,7 @@ description: "A simple url shortner"
 
 publish_to: 'none'
 
-version: 1.0.2+1
+version: 1.0.3+1
 
 environment:
   sdk: 3.6.0
