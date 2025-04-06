@@ -20,8 +20,8 @@ class Constants {
 
   static String get apiBase {
     if (kDebugMode) {
-      // return 'https://url.persist.site';
-      return 'http://127.0.0.1:61131';
+      return 'https://url.persist.site';
+      // return 'http://127.0.0.1:61131';
     }
     return 'https://$_apiBase';
   }

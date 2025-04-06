@@ -29,6 +29,7 @@ class _HomePageState extends State<HomePage> {
   Timer? urlTimer;
   Timer? shortUrlTimer;
   final double helperFontSize = 9;
+  bool isLoading = false;
 
   @override
   void initState() {
@@ -66,13 +67,16 @@ class _HomePageState extends State<HomePage> {
                     _buildShortUrlField(),
                     SizedBox(height: 16),
                     _buildSubmitButton(),
+                    if (isLoading)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 16),
+                        child: Center(child: CircularProgressIndicator()),
+                      ),
                   ],
                 ),
               ),
               _buildViewsButton(context),
-              if (PWAInstall().installPromptEnabled) SizedBox(height: 16),
               if (PWAInstall().installPromptEnabled) _buildPwaInstallButton(),
-              if (PWAInstall().installPromptEnabled) SizedBox(height: 16),
             ],
           ),
         ),
@@ -82,26 +86,29 @@ class _HomePageState extends State<HomePage> {
 
   SizedBox _buildViewsButton(BuildContext context) {
     return SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () {
-                  // got to views page material page
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => ViewsPage()));
-                },
-                child: Text('Check Views'),
-              ),
-            );
-  }
-
-  SizedBox _buildPwaInstallButton() {
-    return SizedBox(
       width: double.infinity,
       child: ElevatedButton(
         onPressed: () {
-          PWAInstall().promptInstall_();
+          // got to views page material page
+          Navigator.push(
+              context, MaterialPageRoute(builder: (context) => ViewsPage()));
         },
-        child: const Text('Install PWA'),
+        child: Text('Check Views'),
+      ),
+    );
+  }
+
+  Padding _buildPwaInstallButton() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: SizedBox(
+        width: double.infinity,
+        child: ElevatedButton(
+          onPressed: () {
+            PWAInstall().promptInstall_();
+          },
+          child: const Text('Install PWA'),
+        ),
       ),
     );
   }
@@ -228,7 +235,8 @@ class _HomePageState extends State<HomePage> {
     return Padding(
       padding: const EdgeInsets.only(top: 16.0),
       child: ElevatedButton(
-        onPressed: !isShortUrlValid || !isUrlValid ? null : submitUrl,
+        onPressed:
+            (!isShortUrlValid || !isUrlValid || isLoading) ? null : submitUrl,
         style: ElevatedButton.styleFrom(
           padding: EdgeInsets.symmetric(vertical: 12, horizontal: 24),
         ),
@@ -242,9 +250,10 @@ class _HomePageState extends State<HomePage> {
       FocusScope.of(context).unfocus();
 
       // Show loading state if needed
-      setState(() {});
+      setState(() => isLoading = true);
 
       final String shortUrl = shortUrlController.text;
+
       try {
         if (shortUrl.isNotEmpty) {
           if (shortUrl.length < 3) {
@@ -286,6 +295,7 @@ class _HomePageState extends State<HomePage> {
       } catch (e) {
         showSnackbar('Error: ${e.toString()}');
       }
+      setState(() => isLoading = false);
     }
   }
 
