@@ -36,11 +36,18 @@ class ShortenedUrlDialog extends StatelessWidget {
                     mode: LaunchMode.externalApplication,
                   );
                 },
-                child: ColoredTextBox.green('url.persist.site/$shortenedUrl'),
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(maxWidth: 180),
+                  child: ColoredTextBox.blue(
+                    'url.persist.site/$shortenedUrl',
+                    fontSize: 11,
+                    upperCase: false,
+                  ),
+                ),
               ),
-              IconButton(
-                icon: Icon(Icons.copy),
-                onPressed: () {
+              GestureDetector(
+                child: Icon(Icons.copy),
+                onTap: () {
                   Clipboard.setData(
                       ClipboardData(text: 'url.persist.site/$shortenedUrl'));
                   ScaffoldMessenger.of(context).showSnackBar(
