@@ -4,7 +4,7 @@ class ShortUrl {
 
   ShortUrl({required this.originalUrl, required this.shortUrl});
 
-  factory ShortUrl.fromMap(Map<String, dynamic> map) {
+  factory ShortUrl.fromMap(Map<dynamic, dynamic> map) {
     return ShortUrl(
       originalUrl: map['originalUrl'],
       shortUrl: map['shortUrl'],

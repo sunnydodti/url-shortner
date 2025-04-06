@@ -30,52 +30,69 @@ class HistoryPage extends StatelessWidget {
       children: [
         Expanded(
           child: ListView.builder(
-                itemCount: urlProvider.urls.length,
-                itemBuilder: (context, index) {
-                  final url = urlProvider.urls[index];
-                  return ListTile(
-                    title: Text(url.shortUrl),
-                    subtitle: Text(url.originalUrl),
-                    onTap: () {
-                      showDialog(
-                        context: context,
-                        builder: (_) => ShortenedUrlDialog(
-                          shortenedUrl: url.shortUrl,
-                          url: url.originalUrl,
-                        ),
-                      );
-                    },
-                    trailing: IconButton(
-                      icon: Icon(Icons.delete),
-                      onPressed: () {
-                        showDialog(
-                          context: context,
-                          builder: (_) => AlertDialog(
-                            title: Text('Delete URL'),
-                            content: Text('Are you sure you want to delete this URL?'),
-                            actions: [
-                              TextButton(
-                                onPressed: () => Navigator.pop(context),
-                                child: Text('Cancel'),
-                              ),
-                              TextButton(
-                                onPressed: () {
-                                  urlProvider.deleteUrl(index);
-                                  Navigator.pop(context);
-                                },
-                                child: Text('Delete'),
-                              ),
-                            ],
-                          ),
-                        );
-                      },
+            itemCount: urlProvider.urls.length,
+            itemBuilder: (context, index) {
+              final url = urlProvider.urls[index];
+              return ListTile(
+                title: Text(url.shortUrl),
+                subtitle: Text(url.originalUrl),
+                onTap: () {
+                  showDialog(
+                    context: context,
+                    builder: (_) => ShortenedUrlDialog(
+                      shortenedUrl: url.shortUrl,
+                      url: url.originalUrl,
+                      dialog: 'Short Url',
                     ),
                   );
                 },
-              ),
+                trailing: IconButton(
+                  icon: Icon(Icons.delete),
+                  onPressed: () {
+                    Brightness brightness =
+                        Theme.of(context).colorScheme.brightness;
+                    showDialog(
+                      context: context,
+                      builder: (_) => AlertDialog(
+                        title: Text('Delete URL'),
+                        content: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('Are you sure you want to delete this URL?'),
+                            SizedBox(height: 16),
+                            Text(
+                              'Actualy short url will not be deleted',
+                              style: TextStyle(
+                                  color: brightness == Brightness.dark
+                                      ? Colors.red.shade200
+                                      : Colors.red.shade800),
+                            ),
+                          ],
+                        ),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(context),
+                            child: Text('Cancel'),
+                          ),
+                          TextButton(
+                            onPressed: () {
+                              urlProvider.deleteUrl(index);
+                              Navigator.pop(context);
+                            },
+                            child: Text('Delete'),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
+              );
+            },
+          ),
         ),
         Container(
-          padding: const EdgeInsets.symmetric(vertical: 16.0),
+          padding: const EdgeInsets.all(16.0),
           width: double.infinity,
           child: ElevatedButton(
             onPressed: () {

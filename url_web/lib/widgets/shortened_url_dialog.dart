@@ -9,15 +9,17 @@ class ShortenedUrlDialog extends StatelessWidget {
     super.key,
     required this.shortenedUrl,
     required this.url,
+    this.dialog = 'URL Shortened Successfully',
   });
 
   final String shortenedUrl;
   final String url;
+  final String dialog;
 
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text('URL Shortened Successfully'),
+      title: Text(dialog),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,

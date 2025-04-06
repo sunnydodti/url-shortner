@@ -5,7 +5,7 @@ class UrlHistory {
 
   UrlHistory({required this.shortUrls});
 
-  factory UrlHistory.fromMap(Map<String, dynamic> map) {
+  factory UrlHistory.fromMap(Map<dynamic, dynamic> map) {
     return UrlHistory(
       shortUrls: (map['shortUrls'] as List)
           .map((item) => ShortUrl.fromMap(item))
