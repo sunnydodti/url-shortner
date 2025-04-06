@@ -10,6 +10,7 @@ class Constants {
   static String isActiveKey = 'is_active';
   static String currentDataKey = 'current_data';
   static String indexKey = 'index';
+  static String urlHistoryKey = 'url_history';
 
   static String urlTable = 'url';
 

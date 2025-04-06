@@ -5,7 +5,7 @@ import 'package:pwa_install/pwa_install.dart';
 import '../data/constants.dart';
 
 class StartupService {
-  static Future<void> init() async {
+    static Future<void> init() async {
     await _init();
   }
 

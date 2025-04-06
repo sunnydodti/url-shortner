@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import 'app.dart';
 import 'data/provider/theme_provider.dart';
+import 'data/provider/url_provider.dart';
 import 'service/startup_service.dart';
 
 void main() async {
@@ -11,6 +12,7 @@ void main() async {
   runApp(MultiProvider(
     providers: [
       ChangeNotifierProvider(create: (_) => ThemeProvider()),
+      ChangeNotifierProvider(create: (_) => UrlProvider()),
     ],
     child: const UrlShortner(),
   ));

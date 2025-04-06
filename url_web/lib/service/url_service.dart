@@ -1,7 +1,11 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
+import 'package:hive_ce/hive.dart';
 import 'package:http/http.dart' as http;
 
 import '../data/constants.dart';
+import '../models/short_url.dart';
+import '../models/url_history.dart';
 
 class UrlService {
   static Future<String> shortenUrl(String longUrl,
@@ -18,6 +22,7 @@ class UrlService {
 
       if (response.statusCode == 201) {
         final data = jsonDecode(response.body);
+        saveShorternedUrl(data['shortCode'], longUrl);
         return data['shortCode'];
       } else {
         // Parse error message from the response if available
@@ -35,7 +40,7 @@ class UrlService {
         throw Exception(errorMessage);
       }
     } catch (e) {
-      print('Error shortening URL: $e');
+      debugPrint('Error shortening URL: $e');
       if (e is Exception) {
         rethrow;
       }
@@ -58,11 +63,11 @@ class UrlService {
         final data = jsonDecode(response.body);
         return data['isAvailable'] == true;
       } else {
-        print('Failed to check availability: ${response.statusCode}');
+        debugPrint('Failed to check availability: ${response.statusCode}');
         return false;
       }
     } catch (e) {
-      print('Error checking availability: $e');
+      debugPrint('Error checking availability: $e');
       return false;
     }
   }
@@ -84,8 +89,30 @@ class UrlService {
         throw Exception('failed - ${response.statusCode}');
       }
     } catch (e) {
-      print('Error fetching views: $e');
+      debugPrint('Error fetching views: $e');
       throw Exception('Error fetching views: $e');
     }
+  }
+
+  static saveShorternedUrl(shortUrl, longUrl) async {
+    try {
+      await addNewUrl(ShortUrl(
+        originalUrl: longUrl,
+        shortUrl: shortUrl,
+      ));
+    } catch (e) {
+      debugPrint('Error saving shortened URL: $e');
+    }
+  }
+
+  static Future<void> addNewUrl(ShortUrl url) async {
+    final box = Hive.box(Constants.box);
+    final urlHistoryMap = box.get(Constants.urlHistoryKey, defaultValue: {
+      'shortUrls': [],
+    });
+    final urlHistory =
+        UrlHistory.fromMap(Map<String, dynamic>.from(urlHistoryMap));
+    urlHistory.shortUrls.add(url);
+    await box.put(Constants.urlHistoryKey, urlHistory.toMap());
   }
 }

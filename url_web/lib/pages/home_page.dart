@@ -12,6 +12,7 @@ import '../widgets/colored_text_box.dart';
 import '../widgets/mobile_wrapper.dart';
 import '../widgets/my_appbar.dart';
 import '../widgets/shortened_url_dialog.dart';
+import 'history_page.dart';
 import 'views_page.dart';
 
 class HomePage extends StatefulWidget {
@@ -84,17 +85,37 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  SizedBox _buildViewsButton(BuildContext context) {
-    return SizedBox(
-      width: double.infinity,
-      child: ElevatedButton(
-        onPressed: () {
-          // got to views page material page
-          Navigator.push(
-              context, MaterialPageRoute(builder: (context) => ViewsPage()));
-        },
-        child: Text('Check Views'),
-      ),
+  Row _buildViewsButton(BuildContext context) {
+    return Row(
+      children: [
+        Expanded(
+          child: SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: () {
+                // got to views page material page
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => ViewsPage()));
+              },
+              child: Text('Check Views'),
+            ),
+          ),
+        ),
+        SizedBox(width: 16),
+        Expanded(
+          child: SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: () {
+                // got to views page material page
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => HistoryPage()));
+              },
+              child: Text('Check History'),
+            ),
+          ),
+        ),
+      ],
     );
   }
 

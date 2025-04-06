@@ -144,7 +144,7 @@ class ViewsPageState extends State<ViewsPage> {
   Widget build(BuildContext context) {
     return MobileWrapper(
       child: Scaffold(
-        appBar: MyAppbar.build(context, title: 'Check Views'),
+        appBar: MyAppbar.build(context, title: 'Views'),
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         body: Padding(
           padding: const EdgeInsets.all(16.0),
