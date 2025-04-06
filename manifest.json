@@ -1,6 +1,6 @@
 {
-    "name": "url_web",
-    "short_name": "url_web",
+    "name": "Url Shorther",
+    "short_name": "Url Shortner",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#hexcode",
