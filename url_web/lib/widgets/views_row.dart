@@ -23,39 +23,41 @@ class _ViewsRowState extends State<ViewsRow> {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Text('Views:'),
-        Spacer(),
-        if (loading)
-          Center(
-            child: Container(
-              margin: EdgeInsets.only(right: 5),
-              width: 15,
-              height: 15,
-              child: CircularProgressIndicator(strokeWidth: 1),
+    return SizedBox(
+      height: 25,
+      child: Row(
+        children: [
+          Text('Views:'),
+          Spacer(),
+          if (loading)
+            Center(
+              child: Container(
+                margin: EdgeInsets.only(right: 5),
+                width: 15,
+                height: 15,
+                child: CircularProgressIndicator(strokeWidth: 1),
+              ),
             ),
-          ),
-        if (error)
-          GestureDetector(
-            onTap: () {
-              setState(() {
-                loading = true;
-                error = false;
-              });
-              fetchViews();
-            },
-            child: Icon(Icons.refresh),
-          ),
-        if (!loading && !error) ColoredTextBox.green(views.toString()),
-      ],
+          if (error)
+            GestureDetector(
+              onTap: () {
+                setState(() {
+                  loading = true;
+                  error = false;
+                });
+                fetchViews();
+              },
+              child: Icon(Icons.refresh),
+            ),
+          if (!loading && !error) ColoredTextBox.green(views.toString()),
+        ],
+      ),
     );
   }
 
   void fetchViews() async {
     setState(() => loading = true);
     try {
-      await Future.delayed(Duration(seconds: 1));
       views = await UrlService.getViews(widget.shortUrl);
       setState(() => loading = false);
     } catch (e) {
