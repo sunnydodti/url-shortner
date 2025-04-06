@@ -2,10 +2,12 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 import 'package:pwa_install/pwa_install.dart';
 import 'package:validators/validators.dart';
 
 import '../data/constants.dart';
+import '../data/provider/url_provider.dart';
 import '../enums/url_status.dart';
 import '../service/url_service.dart';
 import '../widgets/colored_text_box.dart';
@@ -107,9 +109,10 @@ class _HomePageState extends State<HomePage> {
             width: double.infinity,
             child: ElevatedButton(
               onPressed: () {
-                // got to views page material page
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => HistoryPage()));
+                Provider.of<UrlProvider>(context, listen: false).loadUrls();
+                Navigator.push(context, MaterialPageRoute(builder: (context) {
+                  return HistoryPage();
+                }));
               },
               child: Text('Check History'),
             ),
