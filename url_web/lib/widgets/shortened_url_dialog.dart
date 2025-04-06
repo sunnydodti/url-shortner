@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'colored_text_box.dart';
+import 'views_row.dart';
 
 class ShortenedUrlDialog extends StatelessWidget {
   const ShortenedUrlDialog({
@@ -10,14 +11,16 @@ class ShortenedUrlDialog extends StatelessWidget {
     required this.shortenedUrl,
     required this.url,
     this.dialog = 'URL Shortened Successfully',
+    this.showViews = false,
   });
 
   final String shortenedUrl;
   final String url;
   final String dialog;
-
+  final bool showViews;
   @override
   Widget build(BuildContext context) {
+    double width = MediaQuery.of(context).size.width;
     return AlertDialog(
       title: Text(dialog),
       content: Column(
@@ -37,8 +40,8 @@ class ShortenedUrlDialog extends StatelessWidget {
                   );
                 },
                 child: ConstrainedBox(
-                  constraints: BoxConstraints(maxWidth: 180),
-                  child: ColoredTextBox.blue(
+                  constraints: BoxConstraints(maxWidth: width * 0.5),
+                  child: ColoredTextBox.green(
                     'url.persist.site/$shortenedUrl',
                     fontSize: 11,
                     upperCase: false,
@@ -46,7 +49,10 @@ class ShortenedUrlDialog extends StatelessWidget {
                 ),
               ),
               GestureDetector(
-                child: Icon(Icons.copy),
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 8.0),
+                  child: Icon(Icons.copy),
+                ),
                 onTap: () {
                   Clipboard.setData(
                       ClipboardData(text: 'url.persist.site/$shortenedUrl'));
@@ -61,11 +67,8 @@ class ShortenedUrlDialog extends StatelessWidget {
           SizedBox(height: 16),
           Text('Original URL:'),
           SizedBox(height: 8),
-          Text(
-            url,
-            maxLines: 3,
-            overflow: TextOverflow.ellipsis,
-          ),
+          Text(url, maxLines: 3, overflow: TextOverflow.ellipsis),
+          if (showViews) _buildViews(),
         ],
       ),
       actions: [
@@ -78,4 +81,13 @@ class ShortenedUrlDialog extends StatelessWidget {
       ],
     );
   }
+
+  Column _buildViews() => Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          SizedBox(height: 16),
+          ViewsRow(shortUrl: shortenedUrl),
+          SizedBox(height: 16),
+        ],
+      );
 }

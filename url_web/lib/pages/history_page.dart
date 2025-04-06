@@ -43,6 +43,7 @@ class HistoryPage extends StatelessWidget {
                       shortenedUrl: url.shortUrl,
                       url: url.originalUrl,
                       dialog: 'Short Url',
+                      showViews: true,
                     ),
                   );
                 },
