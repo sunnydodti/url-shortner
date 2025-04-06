@@ -48,17 +48,17 @@ export async function shortenUrl(c: Context) {
         if (!url) return c.json({ "error": "invalid request" }, 400);
 
         if (!url.startsWith("http")) url = "https://" + url;
-        if (!isUrlHttp(url)) return c.json({ "error": "invalid url" }, 400);
+        if (!isValidHttpUrl(url)) return c.json({ "error": "invalid http url" }, 400);
 
         if (isNotSupported(url)) return c.json({ "error": "url is not supported" }, 400);
-        
+
         if (shortCode) {
             console.log("shortCode:", shortCode);
             if (shortCode.length < 3 || shortCode.length > 50) return c.json({ "error": "short code length must be between 3 and 50 characters" }, 400);
             if (await isShortCodeTaken(c, shortCode)) return c.json({ "error": "url is already taken" }, 400);
         }
         if (!shortCode || shortCode.length < 1) shortCode = await getUniqueShortUrl(c);
-        
+
         const result = await saveUrlToDbshortCode(c, url, shortCode);
         return c.json({ shortCode, url }, 201);
     } catch (error) {
@@ -176,7 +176,7 @@ async function saveUrlToDbshortCode(c: Context, url: string, shortCode: string, 
 
 }
 
-async function isShortCodeTaken(c: Context, shortCode: string) {
+async function isShortCodeTaken(c: Context, shortCode: string): Promise<boolean> {
     const client = getDbClient(c);
     let isTaken = await client.query(
         `SELECT * FROM ${TABLE_URL} WHERE short_code = $1`,
@@ -185,7 +185,7 @@ async function isShortCodeTaken(c: Context, shortCode: string) {
     return isTaken.rows.length > 0;
 }
 
-async function getByShortcode(c: Context, shortCode: string) {
+async function getByShortcode(c: Context, shortCode: string): Promise<any> {
     const client = getDbClient(c);
     let views = await client.query(
         `SELECT clicks FROM ${TABLE_URL} WHERE short_code = $1`,
@@ -194,7 +194,7 @@ async function getByShortcode(c: Context, shortCode: string) {
     return views;
 }
 
-async function getUniqueShortUrl(c: Context) {
+async function getUniqueShortUrl(c: Context): Promise<string> {
     let shortCode = generateShortUrl();
     while (await isShortCodeTaken(c, shortCode)) {
         shortCode = generateShortUrl();
@@ -206,3 +206,29 @@ function isNotSupported(url: string): boolean {
     return UNSUPPORTED_URLS.some(unsupported => url.includes(unsupported));
 }
 
+function isValidHttpUrl(urlInput: string): boolean {
+    try {
+        const url = new URL(urlInput);
+
+        // Check for proper protocol
+        if (!['http:', 'https:'].includes(url.protocol)) {
+            return false;
+        }
+
+        // Ensure hostname has at least one dot and reasonable length
+        // This catches many invalid hostnames
+        const hostname = url.hostname;
+        if (!hostname || hostname.length < 3 || !hostname.includes('.')) {
+            return false;
+        }
+
+        const parts = hostname.split('.');
+        if (parts.length < 2 || parts[parts.length - 1].length < 2) {
+            return false;
+        }
+
+        return true;
+    } catch (err) {
+        return false;
+    }
+}
