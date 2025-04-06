@@ -50,7 +50,7 @@ export async function shortenUrl(c: Context) {
         if (!url.startsWith("http")) url = "https://" + url;
         if (!isUrlHttp(url)) return c.json({ "error": "invalid url" }, 400);
 
-        if (!isNotSupported(url)) return c.json({ "error": "url is not supported" }, 400);
+        if (isNotSupported(url)) return c.json({ "error": "url is not supported" }, 400);
         
         if (shortCode) {
             console.log("shortCode:", shortCode);
