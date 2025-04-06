@@ -1,4 +1,4 @@
-# url_web
+# URL Shortner
 
 A simple url shortner
 
