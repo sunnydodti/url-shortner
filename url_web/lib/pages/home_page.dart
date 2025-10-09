@@ -7,6 +7,7 @@ import 'package:pwa_install/pwa_install.dart';
 import 'package:validators/validators.dart';
 
 import '../data/constants.dart';
+import '../data/provider/theme_provider.dart';
 import '../data/provider/url_provider.dart';
 import '../enums/url_status.dart';
 import '../service/url_service.dart';
@@ -262,11 +263,19 @@ class _HomePageState extends State<HomePage> {
         onPressed:
             (!isShortUrlValid || !isUrlValid || isLoading) ? null : submitUrl,
         style: ElevatedButton.styleFrom(
-          padding: EdgeInsets.symmetric(vertical: 12, horizontal: 24),
-        ),
+            padding: EdgeInsets.symmetric(vertical: 12, horizontal: 24),
+            backgroundColor: getButtonBAckgroundColor(),
+            // foregroundColor: Colors.blue
+            ),
         child: Text('Shorten'),
       ),
     );
+  }
+
+  Color? getButtonBAckgroundColor() {
+    return context.read<ThemeProvider>().isDarkMode
+        ? Colors.blue.shade300.withAlpha(30)
+        : null;
   }
 
   Future<void> submitUrl() async {
