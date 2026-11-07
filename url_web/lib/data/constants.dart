@@ -1,5 +1,7 @@
 import 'package:flutter/foundation.dart';
 
+import 'package:flutter/foundation.dart';
+
 class Constants {
   static String appDisplayName = 'Url Shortner';
 
@@ -14,22 +16,22 @@ class Constants {
 
   static String urlTable = 'url';
 
-  static String url = 'urls.persist.site';
+  static String url = 'urls.persistr.site';
   static String baseUrl = 'https://$url';
 
-  static final String _apiBase = 'url.persist.site';
+  static final String _apiBase = 'url.persistr.site';
 
   static String get apiBase {
     if (kDebugMode) {
-      return 'https://url.persist.site';
+      return 'https://url.persistr.site';
       // return 'http://127.0.0.1:61131';
     }
     return 'https://$_apiBase';
   }
 
   static List<String> unSupportedUrls = [
-    'url.persist.site',
-    'urls.persist.site',
+    'url.persistr.site',
+    'urls.persistr.site',
     'localhost:',
     '127.0.0.1',
   ];
